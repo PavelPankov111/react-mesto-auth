@@ -11,6 +11,7 @@ import DeletePopup from './DeletePopup'
 import EditProfilePopup from './EditProfilePopup'
 import EditAvatarPopup from './EditAvatarPopup'
 import AddPlacePopup from './AddPlacePopup'
+import { BrowserRouter, Route, Switch } from 'react-router-dom'
 
 function App() {
 const popupDeletSubmitButton = document.querySelector('.popup-delete__button')
@@ -177,21 +178,40 @@ const [selectedCard, setSelectedCard] = React.useState({});
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
+    <BrowserRouter>   
+
     <div className="page">
-      <Header/>
-      <DeletePopup title="Вы уверенны?" namePopup="-delete" titleButton="Да" isOpen={isPopupDeleteOpen} close={closeAllPopups} handleSubmit={handleDeleteCard}/>
-      <Main onEditProfile={handleEditProfileClick} onAddPlace={handleAddPlaceClick} onEditAvatar={handleEditAvatarClick} > 
-      </Main>
-      <section className="elements">
-        {cards.map(({ ...whatever}) => <Card {...whatever} key={whatever._id} onCardDelete={() => handleDeleteItem(whatever)} onCardClick={handleCardClick} onClickLike={() => {handleClickLike(whatever)}}  /> )}
-      </section>
-      <EditProfilePopup onClose={closeAllPopups} isOpen={isEditProfilePopupOpen} onUpdateUser={handleUpdateUser} />
-      <AddPlacePopup isOpen={isAddPlaceOpen} close={closeAllPopups} onAddPlace={handleAddPlaceSubmit}/>
-      <EditAvatarPopup onUpdateAvatar={handleUpdateAvatar} isOpen={isEditAvatarOpen} close={closeAllPopups} />
-      <ImagePopup  url={selectedCard.url} title={selectedCard.title} isOpen={isImagePopupOpen} onClose={closeAllPopups}>
-      </ImagePopup>
-      <Footer />
+    <Header/>
+
+    <Switch>  
+
+    <Route path="/mesto-react/sing-up">
+    </Route>
+
+    <Route path="/mesto-react/sing-in">
+    </Route>
+    
+    <Route exact path="/mesto-react/">
+
+    <DeletePopup title="Вы уверенны?" namePopup="-delete" titleButton="Да" isOpen={isPopupDeleteOpen} close={closeAllPopups} handleSubmit={handleDeleteCard}/>
+    <Main onEditProfile={handleEditProfileClick} onAddPlace={handleAddPlaceClick} onEditAvatar={handleEditAvatarClick} > 
+    </Main>
+    <section className="elements">
+      {cards.map(({ ...whatever}) => <Card {...whatever} key={whatever._id} onCardDelete={() => handleDeleteItem(whatever)} onCardClick={handleCardClick} onClickLike={() => {handleClickLike(whatever)}}  /> )}
+    </section>
+    <EditProfilePopup onClose={closeAllPopups} isOpen={isEditProfilePopupOpen} onUpdateUser={handleUpdateUser} />
+    <AddPlacePopup isOpen={isAddPlaceOpen} close={closeAllPopups} onAddPlace={handleAddPlaceSubmit}/>
+    <EditAvatarPopup onUpdateAvatar={handleUpdateAvatar} isOpen={isEditAvatarOpen} close={closeAllPopups} />
+    <ImagePopup  url={selectedCard.url} title={selectedCard.title} isOpen={isImagePopupOpen} onClose={closeAllPopups}>
+    </ImagePopup>
+    </Route> 
+
+    </Switch>  
+
+    <Footer />
     </div>
+
+    </BrowserRouter>
     </CurrentUserContext.Provider>
   );
 }
