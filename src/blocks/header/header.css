@@ -1,5 +1,7 @@
 @import url(./__logo/header__logo.css);
 @import url(./__button/header__button.css);
+@import url(./__email/header__email.css);
+@import url(./__box/header__box.css);
 
 .header{
     margin: 45px auto auto auto;
@@ -8,6 +10,7 @@
     padding-bottom: 40px;
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
 @media screen and (max-width : 950px){
