@@ -213,7 +213,6 @@ function App() {
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
-      <BrowserRouter>
 
         <div className="page">
           <Header email={handleEmail} />
@@ -250,7 +249,6 @@ function App() {
           <Footer />
         </div>
 
-      </BrowserRouter>
     </CurrentUserContext.Provider>
   );
 }
