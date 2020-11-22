@@ -1,14 +1,11 @@
-/* eslint-disable no-restricted-globals */
 import React from 'react';
-import { Link, useHistory } from 'react-router-dom'
-import { api } from '../utils/Api';
+import { Link } from 'react-router-dom'
 
-function Register() {
+function Register(props) {
+    
     const [email, setEmail] = React.useState('')
 
     const [password, setPassword] = React.useState('')
-
-    const history = useHistory()
 
     function handleEmail(e) {
         setEmail(e.target.value)
@@ -20,13 +17,7 @@ function Register() {
 
     function handleSubmit(e) {
         e.preventDefault()
-
-        api.register(email, password).then((res) => {
-            console.log(res)
-            if (res.statusCode !== 400) {
-                history.push('/sing-in');
-            } 
-        })
+        props.register(email, password)
     }
 
     return (

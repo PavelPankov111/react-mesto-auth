@@ -3,8 +3,6 @@ import headerLogo from '../images/vector.svg'
 import { Link, Route, Switch } from 'react-router-dom'
 
 function Header(props) {
-
-
     return <Switch>
         <Route path="/404" exact />
         <Route path="*" exact>
@@ -19,7 +17,7 @@ function Header(props) {
                     <Route exact path="/">
                         <div className="header__box">
                             <p className="header__email">{props.email}</p>
-                            <Link className="header__button" to="/sing-in">Выйти</Link>
+                            <Link onClick={props.onClick} className="header__button" to="/sing-in">Выйти</Link>
                         </div>
                     </Route>
                     <Route path="/sing-in">

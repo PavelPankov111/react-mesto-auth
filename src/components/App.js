@@ -14,9 +14,10 @@ import AddPlacePopup from './AddPlacePopup'
 import Register from './Register'
 import Login from './Login'
 import ProtectedRoute from './ProtectedRoute'
-import { BrowserRouter, Route, Switch, useHistory } from 'react-router-dom'
-import InfoTooltip from './InfoTooltip';
+import { Route, Switch, useHistory } from 'react-router-dom'
 import union from '../images/union.svg'
+import union2 from '../images/union2.svg'
+import InfoTooltip from './InfoTooltip';
 
 function App() {
   const popupDeletSubmitButton = document.querySelector('.popup-delete__button')
@@ -26,8 +27,11 @@ function App() {
   const history = useHistory()
 
   const [loggedIIn, setLoggedIIn] = React.useState(false)
+  const [isPopupInfotooltipOpen, setIsPopupInfotooltipOpen] = React.useState(false)
+  const [img, setImg] =  React.useState()
+  const [title, setTitle] = React.useState('')
 
-  function tokenCheck(){
+  function tokenCheck() {
     if (localStorage.getItem('jwt')) {
       console.log(localStorage.getItem('jwt'))
       api.checkToken(localStorage.getItem('jwt'))
@@ -63,9 +67,9 @@ function App() {
       });
   }, [])
 
-  const handleEditProfileClick = useCallback(() => {
+  const handleEditProfileClick = () => {
     setIsEditProfilePopupOpen(true)
-  }, [isEditProfilePopupOpen])
+  }
 
   const [isAddPlaceOpen, setIsAddPlaceOpen] = React.useState(false)
 
@@ -209,45 +213,81 @@ function App() {
     setLoggedIIn(true)
   }
 
-  const [isPopupInfotooltipOpen, setIsPopupInfotooltipOpen] = React.useState(true)
+  function handleClear(){
+    localStorage.removeItem('jwt')
+  }
+
+  function onRegister(email, password){
+    api.register(email, password).then((res) => {
+      console.log(res)
+      if (res.statusCode !== 400) {
+          setImg(union)
+          setIsPopupInfotooltipOpen(true)
+          setTitle('Вы успешно зарегистрировались!')
+          history.push('/sing-in') 
+      }
+  })
+  .catch((err) => {
+      console.log(err)
+      setIsPopupInfotooltipOpen(true)
+      setImg(union2)
+      setTitle('Что-то пошло не так! Попробуйте ещё раз.')
+  })
+  }
+
+  function onLogin(email, password){
+    api.login(email, password).then((res) => {
+      console.log(res)
+
+      if (res.token) {
+          console.log('true')
+          localStorage.setItem('jwt', res.token)
+          tokenCheck()
+          handleLogIn()
+          setHandleEmail(email)
+          history.push('/')
+
+      }
+  })
+      .catch(() => {
+          console.log('catch')
+          setImg(union2)
+          setTitle('Что-то пошло не так! Попробуйте ещё раз.')
+          setIsPopupInfotooltipOpen(true)
+      })
+  }
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
+      <div className="page">
+      <InfoTooltip namePopup="-infotooltip" isOpen={isPopupInfotooltipOpen} close={closeAllPopups} image={img} title={title} />
+        <Header email={handleEmail} onClick={handleClear}/>
 
-        <div className="page">
-          <Header email={handleEmail} />
+        <Switch>
+          <Route path="/sing-in">
+            <Login login={onLogin}  />
+          </Route>
 
-          <Switch>
+          <Route path="/sing-up">
+            <Register register={onRegister}/>
+          </Route>
+          <ProtectedRoute loggedIn={loggedIIn} exact path='/'>
+            <DeletePopup title="Вы уверенны?" namePopup="-delete" titleButton="Да" isOpen={isPopupDeleteOpen} close={closeAllPopups} handleSubmit={handleDeleteCard} />
+            <Main onEditProfile={handleEditProfileClick} onAddPlace={handleAddPlaceClick} onEditAvatar={handleEditAvatarClick} >
+            </Main>
+            <section className="elements">
+              {cards.map(({ ...whatever }) => <Card {...whatever} key={whatever._id} onCardDelete={() => handleDeleteItem(whatever)} onCardClick={handleCardClick} onClickLike={() => { handleClickLike(whatever) }} />)}
+            </section>
+            <EditProfilePopup onClose={closeAllPopups} isOpen={isEditProfilePopupOpen} onUpdateUser={handleUpdateUser} />
+            <AddPlacePopup isOpen={isAddPlaceOpen} close={closeAllPopups} onAddPlace={handleAddPlaceSubmit} />
+            <EditAvatarPopup onUpdateAvatar={handleUpdateAvatar} isOpen={isEditAvatarOpen} close={closeAllPopups} />
+            <ImagePopup url={selectedCard.url} title={selectedCard.title} isOpen={isImagePopupOpen} onClose={closeAllPopups}>
+            </ImagePopup>
+          </ProtectedRoute>
+        </Switch>
 
-            <Route path="/sing-in">
-              <Login token={tokenCheck} handleLog={handleLogIn} logger={(value) => {
-                console.log(value)
-                setHandleEmail(value)
-              }} />
-            </Route>
-
-            <Route path="/sing-up">
-            <Register />
-            </Route>
-            {console.log(loggedIIn)}
-            <ProtectedRoute loggedIn={loggedIIn} exact path='/'>
-            <InfoTooltip namePopup="-infotooltip" isOpen={isPopupInfotooltipOpen} close={closeAllPopups} image={union} title='Вы успешно зарегистрировались!' />
-              <DeletePopup title="Вы уверенны?" namePopup="-delete" titleButton="Да" isOpen={isPopupDeleteOpen} close={closeAllPopups} handleSubmit={handleDeleteCard} />
-              <Main onEditProfile={handleEditProfileClick} onAddPlace={handleAddPlaceClick} onEditAvatar={handleEditAvatarClick} >
-              </Main>
-              <section className="elements">
-                {cards.map(({ ...whatever }) => <Card {...whatever} key={whatever._id} onCardDelete={() => handleDeleteItem(whatever)} onCardClick={handleCardClick} onClickLike={() => { handleClickLike(whatever) }} />)}
-              </section>
-              <EditProfilePopup onClose={closeAllPopups} isOpen={isEditProfilePopupOpen} onUpdateUser={handleUpdateUser} />
-              <AddPlacePopup isOpen={isAddPlaceOpen} close={closeAllPopups} onAddPlace={handleAddPlaceSubmit} />
-              <EditAvatarPopup onUpdateAvatar={handleUpdateAvatar} isOpen={isEditAvatarOpen} close={closeAllPopups} />
-              <ImagePopup url={selectedCard.url} title={selectedCard.title} isOpen={isImagePopupOpen} onClose={closeAllPopups}>
-              </ImagePopup>
-            </ProtectedRoute>
-          </Switch>
-
-          <Footer />
-        </div>
+        <Footer />
+      </div>
 
     </CurrentUserContext.Provider>
   );
